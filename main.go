@@ -2,6 +2,12 @@ package main
 
 import "fmt"
 
+var a1 string = "111"
+
+const a2 string = "111"
+
 func main() {
-	fmt.Println("Hello World")
+	name := "ilhoon"
+	name = "hoon"
+	fmt.Println(name)
 }
