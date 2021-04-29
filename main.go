@@ -2,27 +2,17 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
-func multiply(a int, b int) int {
-	return a * b
-}
-
-func lenAndUpper(name string) (length int, uppercase string) {
-	defer fmt.Println("done")
-	length = len(name)
-	uppercase = strings.ToUpper(name)
-	return
-}
-
-func repeatMe(words ...string) {
-	fmt.Println(words)
+func superAdd(numbers ...int) int {
+	sum := 0
+	for _, number := range numbers {
+		sum += number
+	}
+	return sum
 }
 
 func main() {
-	length, uppercase := lenAndUpper("ilhoon")
-	fmt.Println(multiply(2, 3))
-	fmt.Println(length, uppercase)
-	repeatMe("aaa", "bbb", "ccc")
+	total := superAdd(1, 2, 3, 4, 5)
+	fmt.Println(total)
 }
