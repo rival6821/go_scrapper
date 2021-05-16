@@ -3,12 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	names := [5]string{"a", "b"}
-	names[2] = "11"
-	names[3] = "22"
-	names[4] = "33"
+	tt := map[string]string{"aa": "bb", "age": "12"}
+	for key, value := range tt {
+		fmt.Println(key, value)
 
-	nameSlice := []string{"vvv"}
-	nameSlice = append(nameSlice, "bb")
-	fmt.Println(names, nameSlice)
+	}
 }
