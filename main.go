@@ -1,15 +1,11 @@
 package main
 
-import "fmt"
-
-type person struct {
-	name    string
-	age     int
-	favFood []string
-}
+import (
+	"fmt"
+	"go_scrapper/accounts"
+)
 
 func main() {
-	favFood := []string{"kk", "bb"}
-	tt := person{name: "ilhon", age: 22, favFood: favFood}
-	fmt.Println(tt)
+	account := accounts.NewAccount("ilhoon")
+	fmt.Println(account)
 }
