@@ -1,10 +1,14 @@
 package accounts
 
+import "errors"
+
 // Account struct
 type Account struct {
 	owner   string
 	balance int
 }
+
+var errNoMoney = errors.New("Can't Withdraw")
 
 // NewAccount creates Account
 func NewAccount(owner string) *Account {
@@ -23,6 +27,10 @@ func (a Account) Balance() int {
 }
 
 //Withdraw from your account
-func (a Account) Withdraw(amount int) {
+func (a *Account) Withdraw(amount int) error {
+	if a.balance < amount {
+		return errNoMoney
+	}
 	a.balance -= amount
+	return nil
 }
