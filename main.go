@@ -2,18 +2,15 @@ package main
 
 import (
 	"fmt"
-	"go_scrapper/accounts"
+	"go_scrapper/mydict"
 )
 
 func main() {
-	account := accounts.NewAccount("ilhoon")
-	fmt.Println(account)
-	account.Deposit(100)
-	fmt.Println(account.Balance())
-	err := account.Withdraw(110)
+	dictionary := mydict.Dictionary{"first": "first word"}
+	definition, err := dictionary.Search("first")
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Println(definition)
 	}
-	fmt.Println(account.Balance(), account.Owner())
-	fmt.Println(account)
 }
