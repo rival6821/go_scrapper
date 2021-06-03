@@ -1,42 +1,34 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"go_scrapper/mydict"
+	"net/http"
 )
 
+var errRequestFailed = errors.New("REQUEST ERROR")
+
 func main() {
-	dictionary := mydict.Dictionary{}
-	err1 := dictionary.Add("first", "first word")
-	if err1 != nil {
-		fmt.Println(err1)
-	} else {
-		fmt.Println(dictionary)
+	urls := []string{
+		"https://naver.com",
+		"https://ilhoon.kr",
+		"https://youtube.com",
 	}
-	definition, err2 := dictionary.Search("first")
-	if err2 != nil {
-		fmt.Println(err2)
-	} else {
-		fmt.Println(definition)
+	for _, url := range urls {
+		err := hitURL(url)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
-	err3 := dictionary.Add("second", "second word")
-	if err3 != nil {
-		fmt.Println(err3)
-	} else {
-		fmt.Println(dictionary)
-	}
+}
 
-	err4 := dictionary.Update("second", "second update word")
-	if err4 != nil {
-		fmt.Println(err4)
-	} else {
-		fmt.Println(dictionary)
+func hitURL(url string) error {
+	fmt.Println("Checking:", url)
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	} else if resp.StatusCode >= 400 {
+		return errRequestFailed
 	}
-
-	err5 := dictionary.Delete("second")
-	if err5 != nil {
-		fmt.Println(err5)
-	} else {
-		fmt.Println(dictionary)
-	}
+	return nil
 }
