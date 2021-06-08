@@ -24,13 +24,43 @@ var baseURL string = "https://kr.indeed.com/%EC%B7%A8%EC%97%85?l=%EB%B6%80%EC%82
 
 func main() {
 	var jobs []extractedJob
+	c := make(chan []extractedJob)
 	totalPages := getPages()
 	for i := 0; i < totalPages; i++ {
-		extractedJobs := getPage(i)
-		jobs = append(jobs, extractedJobs...)
+		go getPage(i, c)
 	}
+
+	for i := 0; i < totalPages; i++ {
+		jobs = append(jobs, <-c...)
+	}
+
 	writejobs(jobs)
-	fmt.Println("Done Extract")
+	fmt.Println("Done Extract", len(jobs))
+}
+
+func getPage(page int, mainC chan<- []extractedJob) {
+	var jobs []extractedJob
+	c := make(chan extractedJob)
+	pageUrl := baseURL + strconv.Itoa(10*page)
+	fmt.Println("Requesting", pageUrl)
+	res, err := http.Get(pageUrl)
+	checkErr(err)
+	checkCode(res)
+
+	defer res.Body.Close()
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	checkErr(err)
+	searchCards := doc.Find(".jobsearch-SerpJobCard")
+
+	searchCards.Each(func(i int, card *goquery.Selection) {
+		go extractJob(card, c)
+	})
+
+	for i := 0; i < searchCards.Length(); i++ {
+		jobs = append(jobs, <-c)
+	}
+
+	mainC <- jobs
 }
 
 func writejobs(jobs []extractedJob) {
@@ -51,34 +81,13 @@ func writejobs(jobs []extractedJob) {
 	}
 }
 
-func getPage(page int) []extractedJob {
-	var jobs []extractedJob
-	pageUrl := baseURL + strconv.Itoa(10*page)
-	fmt.Println("Requesting", pageUrl)
-	res, err := http.Get(pageUrl)
-	checkErr(err)
-	checkCode(res)
-
-	defer res.Body.Close()
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	checkErr(err)
-	searchCards := doc.Find(".jobsearch-SerpJobCard")
-
-	searchCards.Each(func(i int, card *goquery.Selection) {
-		job := extractJob(card)
-		jobs = append(jobs, job)
-	})
-
-	return jobs
-}
-
-func extractJob(card *goquery.Selection) extractedJob {
+func extractJob(card *goquery.Selection, c chan<- extractedJob) {
 	id, _ := card.Attr("data-jk")
 	title := cleanString(card.Find(".title>a").Text())
 	location := cleanString(card.Find(".sjcl").Text())
 	salary := cleanString(card.Find(".salaryText").Text())
 	summary := cleanString(card.Find(".summary").Text())
-	return extractedJob{
+	c <- extractedJob{
 		id:       id,
 		title:    title,
 		location: location,
